@@ -7,6 +7,7 @@ public class LogInForm extends JFrame {
     private JTextField usernameField;
     private JPasswordField passwordField;
     private JButton loginButton, signUpButton;
+    private int customerID = -1; // Initialize to an invalid ID
 
     public LogInForm() {
         setTitle("Hotel Booking - Login");
@@ -25,9 +26,7 @@ public class LogInForm extends JFrame {
         int bgX = (getWidth() - bgIcon.getIconWidth()) / 2;
         int bgY = (getHeight() - bgIcon.getIconHeight()) / 2;
         background.setBounds(bgX, bgY, bgIcon.getIconWidth(), bgIcon.getIconHeight());
-
         add(background);
-
 
         // 🏳️ White Panel for Login Form
         JPanel loginPanel = new JPanel();
@@ -66,24 +65,25 @@ public class LogInForm extends JFrame {
 
         // 🎯 Login Action
         loginButton.addActionListener(e -> {
+            System.out.println("Customer ID" + customerID);
             String username = usernameField.getText();
             String password = new String(passwordField.getPassword());
+
+            // Get role and customer ID
+            customerID = UserManager.getCustomerID(username); // Retrieve customer ID
             String role = UserManager.login(username, password);
 
             if (role == null) {
                 JOptionPane.showMessageDialog(null, "Invalid Credentials", "Error", JOptionPane.ERROR_MESSAGE);
             } else if (role.equals("admin")) {
-                // Redirect to admin dashboard
                 new AdminDashboard().setVisible(true);
                 dispose();
             } else if (role.equals("customer")) {
-                // Redirect to customer dashboard
-                new CustomerDashboard().setVisible(true);
+                new CustomerDashboard(customerID).setVisible(true);
                 dispose();
             } else {
                 JOptionPane.showMessageDialog(null, "Invalid role assigned.");
             }
-
         });
 
         // 🎟️ Sign-Up Action

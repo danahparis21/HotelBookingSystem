@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class UpdateRoomForm extends JFrame {
@@ -49,7 +50,26 @@ public class UpdateRoomForm extends JFrame {
 
         updateButton.addActionListener(this::updateRoom);
 
+        // Fetch existing room details from database
+        loadRoomDetails();
+
         setVisible(true);
+    }
+
+    private void loadRoomDetails() {
+        try (Connection conn = Database.connect();
+             PreparedStatement stmt = conn.prepareStatement("SELECT room_type, price, availability_status FROM rooms WHERE room_id = ?")) {
+            stmt.setInt(1, roomId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                roomTypeBox.setSelectedItem(rs.getString("room_type"));
+                priceField.setText(String.valueOf(rs.getDouble("price")));
+                statusBox.setSelectedItem(rs.getString("availability_status"));
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error loading room details.", "Database Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void updateRoom(ActionEvent e) {

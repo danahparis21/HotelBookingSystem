@@ -66,4 +66,32 @@ public class UserManager {
 
         return null; // Login failed
     }
+
+    static int getCustomerID(String username) {
+        int customerID = -1; // Default invalid ID
+
+        String query = "SELECT c.customer_id FROM customers c " +
+                       "JOIN users u ON c.user_id = u.user_id " +
+                       "WHERE u.username = ?";
+
+        try (Connection conn = Database.connect();
+             PreparedStatement pstmt = conn.prepareStatement(query)) {
+
+            pstmt.setString(1, username);
+            ResultSet rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                customerID = rs.getInt("customer_id"); // Retrieve customer ID from database
+                System.out.println("✅ Customer ID found: " + customerID);
+        } else {
+            System.out.println("No customer found for username: " + username);
+        }
+            
+
+        } catch (SQLException e) {
+            e.printStackTrace(); // Log errors properly in production
+        }
+
+        return customerID; 
+    }
 }
