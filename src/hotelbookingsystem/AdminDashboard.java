@@ -158,15 +158,11 @@ public class AdminDashboard extends JFrame {
         JButton logOut = new JButton("Log Out");
         
         bookedRooms.setBounds(1000, 100, 200, 30);
-        checkIn.setBounds(1000, 200, 200, 30);
-        checkOut.setBounds(1000, 300, 200, 30);
         bookingHistory.setBounds(1000, 400, 200, 30);
         performance.setBounds(1000, 500, 200, 30);
         logOut.setBounds(1000, 600, 200, 30);
         
         add(bookedRooms);
-        add(checkIn);
-        add(checkOut);
         add(bookingHistory);
         add(performance);
         add(logOut);
@@ -183,6 +179,8 @@ public class AdminDashboard extends JFrame {
         
         bookedRooms.addActionListener(e -> new BookedRooms().setVisible(true));
         logOut.addActionListener(e -> logOut());
+        bookingHistory.addActionListener(e -> new BookingHistory().setVisible(true));
+        performance.addActionListener(e -> new Performance().setVisible(true));
         // Load rooms on start
         loadRooms();
         loadStatistics();

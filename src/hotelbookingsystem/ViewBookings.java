@@ -80,7 +80,7 @@ public class ViewBookings extends JFrame {
                          "FROM bookings b " +
                          "JOIN customers c ON b.customer_id = c.customer_id " +
                          "JOIN rooms r ON b.room_id = r.room_id " +
-                         "WHERE b.customer_id = ?";
+                         "WHERE b.customer_id = ? and b.status != 'Canceled'";
             PreparedStatement stmt = conn.prepareStatement(sql);
             stmt.setInt(1, customerID);
             ResultSet rs = stmt.executeQuery();
@@ -128,11 +128,11 @@ public class ViewBookings extends JFrame {
             }
             int roomID = rs.getInt("room_id");
             
-            // Delete the booking
-            String deleteBookingSQL = "DELETE FROM bookings WHERE booking_id = ? AND status = 'Confirmed'";
-            PreparedStatement deleteStmt = conn.prepareStatement(deleteBookingSQL);
-            deleteStmt.setInt(1, selectedBookingID);
-            int rowsAffected = deleteStmt.executeUpdate();
+            // Update booking status to 'Cancelled' instead of deleting
+            String updateBookingSQL = "UPDATE bookings SET status = 'Canceled' WHERE booking_id = ? AND status = 'Confirmed'";
+            PreparedStatement updateBookingStmt = conn.prepareStatement(updateBookingSQL);
+            updateBookingStmt.setInt(1, selectedBookingID);
+            int rowsAffected = updateBookingStmt.executeUpdate();
 
             if (rowsAffected > 0) {
                 // Update room availability_status

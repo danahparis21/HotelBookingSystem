@@ -9,20 +9,20 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class BookedRooms extends JFrame {
+public class BookingHistory extends JFrame {
     private JTable bookedRooms;
     private DefaultTableModel tableModel;
     private JLabel lblCustomerId, lblCustomerName, lblEmail, lblPhone, lblUserId;
     private JTextField txtCustomerId, txtCustomerName, txtEmail, txtPhone, txtUserId;
 
-    public BookedRooms() {
+    public BookingHistory() {
         setTitle("Booked Rooms");
         setSize(900, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(null);
 
-        JLabel titleLabel = new JLabel("Booked Rooms", SwingConstants.CENTER);
+        JLabel titleLabel = new JLabel("Booking History", SwingConstants.CENTER);
         titleLabel.setBounds(250, 10, 400, 30);
         add(titleLabel);
 
@@ -90,21 +90,6 @@ public class BookedRooms extends JFrame {
 
         // Fetch bookings from the database
         fetchBookings();
-        
-        // Check-In Button
-        JButton checkInButton = new JButton("Check In");
-        checkInButton.setBounds(600, 270, 120, 30);
-        add(checkInButton);
-        checkInButton.setEnabled(false); // Disabled until a row is selected
-        
-        
-
-        // Check-Out Button
-        JButton checkOutButton = new JButton("Check Out");
-        checkOutButton.setBounds(750, 270, 120, 30);
-        add(checkOutButton);
-        checkOutButton.setEnabled(false); // Disabled until a room is checked in
-
 
         // Table row selection listener
         bookedRooms.addMouseListener(new MouseAdapter() {
@@ -114,93 +99,19 @@ public class BookedRooms extends JFrame {
                 if (selectedRow != -1) {
                     String customerId = tableModel.getValueAt(selectedRow, 1).toString();
                     loadCustomerDetails(customerId);
-                    // Get booking and room status
-                    String bookingStatus = tableModel.getValueAt(selectedRow, 7).toString();
-                    String roomStatus = tableModel.getValueAt(selectedRow, 8).toString();
-
-                    // Enable Check-In only if booking is pending
-                    checkInButton.setEnabled(bookingStatus.equalsIgnoreCase("Confirmed"));
-
-                    // Enable Check-Out only if checked in
-                    checkOutButton.setEnabled(bookingStatus.equalsIgnoreCase("Confirmed"));
-                        }
-                    }
-        });
-        
-        checkInButton.addActionListener(e -> {
-            int selectedRow = bookedRooms.getSelectedRow();
-            if (selectedRow != -1) {
-                int bookingId = (int) tableModel.getValueAt(selectedRow, 0);
-                int roomId = (int) tableModel.getValueAt(selectedRow, 2);
-
-                try (Connection conn = Database.connect();)
-                {
-
-                    JOptionPane.showMessageDialog(this, "Guest Checked In Successfully!");
-                    fetchBookings(); // Refresh table
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(this, "Error during check-in!", "Database Error", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
-        
-        checkOutButton.addActionListener(e -> {
-            int selectedRow = bookedRooms.getSelectedRow();
-            if (selectedRow != -1) {
-                int bookingId = (int) tableModel.getValueAt(selectedRow, 0);
-                int roomId = (int) tableModel.getValueAt(selectedRow, 2);
-
-                String updateBooking = "UPDATE bookings SET status = 'Completed' WHERE booking_id = ?";
-                String updateRoom = "UPDATE rooms SET availability_status = 'Under Maintenance' WHERE room_id = ?";
-
-                try (Connection conn = Database.connect();
-                     PreparedStatement stmt = conn.prepareStatement(updateBooking);
-                     PreparedStatement stmtRoom = conn.prepareStatement(updateRoom)) {
-
-                    stmt.setInt(1, bookingId);
-                    stmt.executeUpdate();
-
-                    stmtRoom.setInt(1, roomId);
-                    stmtRoom.executeUpdate();
-
-                    generateReceipt(selectedRow); // Generate and display receipt
-                    JOptionPane.showMessageDialog(this, "Guest Checked Out Successfully!");
-                    fetchBookings(); // Refresh table
-                } catch (SQLException ex) {
-                    ex.printStackTrace();
-                    JOptionPane.showMessageDialog(this, "Error during check-out!", "Database Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        });
-
-
-    }
-    
-    private void generateReceipt(int selectedRow) {
-        String receipt = "========== Receipt ==========\n"
-                + "Booking ID: " + tableModel.getValueAt(selectedRow, 0) + "\n"
-                + "Customer ID: " + tableModel.getValueAt(selectedRow, 1) + "\n"
-                + "Room ID: " + tableModel.getValueAt(selectedRow, 2) + "\n"
-                + "Room Type: " + tableModel.getValueAt(selectedRow, 3) + "\n"
-                + "Price: $" + tableModel.getValueAt(selectedRow, 4) + "\n"
-                + "Check-In Date: " + tableModel.getValueAt(selectedRow, 5) + "\n"
-                + "Check-Out Date: " + tableModel.getValueAt(selectedRow, 6) + "\n"
-                + "Status: Completed\n"
-                + "===================================";
-
-        JOptionPane.showMessageDialog(this, receipt, "Booking Receipt", JOptionPane.INFORMATION_MESSAGE);
     }
 
-
-     private void fetchBookings() {
+    private void fetchBookings() {
         tableModel.setRowCount(0);
         String query = "SELECT b.booking_id, c.customer_id, r.room_id, r.room_type, r.price, " +
                        "b.check_in_date, b.check_out_date, b.status, r.availability_status " +
                        "FROM bookings b " +
                        "JOIN customers c ON b.customer_id = c.customer_id " +
-                       "JOIN rooms r ON b.room_id = r.room_id WHERE r.availability_status = 'Booked'";
-      
+                       "JOIN rooms r ON b.room_id = r.room_id " +
+                       "WHERE b.status IN ('Completed', 'Cancelled')"; // Only fetch past bookings
 
         try (Connection conn = Database.connect();
              PreparedStatement stmt = conn.prepareStatement(query);
@@ -224,7 +135,7 @@ public class BookedRooms extends JFrame {
             JOptionPane.showMessageDialog(this, "Error loading booked rooms.", "Database Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-     
+
     private void loadCustomerDetails(String customerId) {
         String query = "SELECT * FROM customers WHERE customer_id = ?";
         try (Connection conn = Database.connect();
@@ -253,6 +164,6 @@ public class BookedRooms extends JFrame {
     }
 
     public static void main(String[] args) {
-        new BookedRooms().setVisible(true);
+        new BookingHistory().setVisible(true);
     }
 }
