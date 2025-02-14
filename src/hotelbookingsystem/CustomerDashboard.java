@@ -3,10 +3,14 @@ package hotelbookingsystem;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import com.toedter.calendar.JDateChooser;
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Font;
 import java.awt.event.*;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import javax.swing.border.EmptyBorder;
 
 public class CustomerDashboard extends JFrame {
     private JDateChooser checkInDate;
@@ -28,80 +32,60 @@ public class CustomerDashboard extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(null);
-        
+        getContentPane().setBackground(new Color(248, 247, 246)); // Set background color
 
-
-        JLabel lblCheckIn = new JLabel("Check-in Date:");
-        lblCheckIn.setBounds(30, 30, 100, 25);
-        add(lblCheckIn);
+        // Header Image
+        ImageIcon icon = new ImageIcon(getClass().getResource("/icons/header1.png"));
+        JLabel header = new JLabel(icon);
+        header.setBounds(0, 0, 1920, 70);
+        add(header);
         
+        addComponentListener(new ComponentAdapter() {
+        @Override
+        public void componentResized(ComponentEvent e) {
+            header.setBounds((getWidth() - icon.getIconWidth()) / 2, 0, icon.getIconWidth(), icon.getIconHeight());
+
+        }
+    });
+
+        JLabel lblCheckIn = createLabel("Check-in Date:", 30, 100);
         checkInDate = new JDateChooser();
-        checkInDate.setBounds(140, 30, 150, 25);
+        checkInDate.setBounds(140, 100, 150, 30);
         add(checkInDate);
-        
-        JLabel lblDuration = new JLabel("Duration (days):");
-        lblDuration.setBounds(30, 70, 100, 25);
-        add(lblDuration);
-        
+
+        JLabel lblDuration = createLabel("Duration (days):", 30, 150);
         duration = new JSpinner(new SpinnerNumberModel(1, 1, 30, 1));
-        duration.setBounds(140, 70, 50, 25);
+        duration.setBounds(140, 150, 50, 30);
         add(duration);
-        
-        JLabel lblCheckOut = new JLabel("Check-out Date:");
-        lblCheckOut.setBounds(30, 110, 100, 25);
-        add(lblCheckOut);
-        
+
+        JLabel lblCheckOut = createLabel("Check-out Date:", 30, 200);
         checkOutDate = new JTextField();
-        checkOutDate.setBounds(140, 110, 150, 25);
+        checkOutDate.setBounds(140, 200, 150, 30);
         checkOutDate.setEditable(false);
         add(checkOutDate);
-        
-        JLabel lblAdults = new JLabel("Adults:");
-        lblAdults.setBounds(30, 150, 50, 25);
-        add(lblAdults);
-        
-        adults = new JTextField("1");
-        adults.setBounds(80, 150, 50, 25);
-        add(adults);
-        
-        JLabel lblChildren = new JLabel("Children:");
-        lblChildren.setBounds(150, 150, 60, 25);
-        add(lblChildren);
-        
-        children = new JTextField("0");
-        children.setBounds(220, 150, 50, 25);
-        add(children);
-        
-        JLabel lblRooms = new JLabel("Rooms:");
-        lblRooms.setBounds(30, 190, 50, 25);
-        add(lblRooms);
-        
-        rooms = new JTextField("1");
-        rooms.setBounds(80, 190, 50, 25);
-        add(rooms);
-        
-        searchRooms = new JButton("Search Rooms");
-        searchRooms.setBounds(30, 230, 150, 30);
-        add(searchRooms);
 
-        bookRoom = new JButton("Book Room");
-        bookRoom.setBounds(200, 230, 150, 30);
-        add(bookRoom);
+        JLabel lblAdults = createLabel("Adults:", 30, 250);
+        adults = createTextField("1", 80, 250);
+
+        JLabel lblChildren = createLabel("Children:", 150, 250);
+        children = createTextField("0", 220, 250);
+
+        JLabel lblRooms = createLabel("Rooms:", 30, 300);
+        rooms = createTextField("1", 80, 300);
+
+        searchRooms = createButton("Search Rooms", 30, 350);
+        bookRoom = createButton("Book Room", 200, 350);
         
-        viewBookings = new JButton("View My Bookings");
-        viewBookings.setBounds(1000, 230, 150, 30);
-        add(viewBookings);
-        
-        logOut = new JButton("Log Out");
-        logOut.setBounds(1000, 300, 150, 30);
-        add(logOut);
-        
+
         String[] columns = {"Room ID", "Type", "Price", "Availability"};
         tableModel = new DefaultTableModel(columns, 0);
         roomsTable = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(roomsTable);
-        scrollPane.setBounds(30, 280, 700, 250);
+        scrollPane.setBounds(30, 420, 700, 300);
         add(scrollPane);
+        
+        viewBookings = createButton("View My Bookings", 1000, 350);
+        logOut = createButton("Log Out", 1000, 400);
         
         // Calculate check-out date based on duration
         duration.addChangeListener(e -> updateCheckOutDate());
@@ -112,6 +96,36 @@ public class CustomerDashboard extends JFrame {
         bookRoom.addActionListener(e -> bookSelectedRoom());
         viewBookings.addActionListener(e -> new ViewBookings(loggedInCustomerID));
         logOut.addActionListener(e -> logOut());
+    }
+    
+    private JLabel createLabel(String text, int x, int y) {
+        JLabel label = new JLabel(text);
+        label.setBounds(x, y, 120, 30);
+        label.setFont(new Font("SansSerif", Font.BOLD, 14));
+        label.setForeground(new Color(50, 50, 50));
+        panel.add(label);
+        return label;
+    }
+
+    private JTextField createTextField(String text, int x, int y) {
+        JTextField textField = new JTextField(text);
+        textField.setBounds(x, y, 50, 30);
+        textField.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        add(textField);
+        return textField;
+    }
+
+    private JButton createButton(String text, int x, int y) {
+        JButton button = new JButton(text);
+        button.setBounds(x, y, 170, 40);
+        button.setBackground(new Color(30, 144, 255));
+        button.setForeground(Color.WHITE);
+        button.setFont(new Font("SansSerif", Font.BOLD, 14));
+        button.setFocusPainted(false);
+        button.setBorder(new EmptyBorder(5, 10, 5, 10));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        add(button);
+        return button;
     }
     
     private void logOut(){
