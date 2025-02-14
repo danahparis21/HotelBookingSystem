@@ -187,8 +187,7 @@ public class BookingHistory extends JFrame {
                        "b.check_in_date, b.check_out_date, b.status, r.availability_status " +
                        "FROM bookings b " +
                        "JOIN customers c ON b.customer_id = c.customer_id " +
-                       "JOIN rooms r ON b.room_id = r.room_id " +
-                       "WHERE b.status IN ('Completed', 'Cancelled')"; // Only fetch past bookings
+                       "JOIN rooms r ON b.room_id = r.room_id"; // Only fetch past bookings
 
         try (Connection conn = Database.connect();
              PreparedStatement stmt = conn.prepareStatement(query);

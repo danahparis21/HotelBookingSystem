@@ -19,7 +19,8 @@ public class CustomerDashboard extends JFrame {
     private JDateChooser checkInDate;
     private JTextField checkOutDate;
     private JSpinner duration;
-    private JTextField adults, children, rooms;
+    private JTextField adults, children;
+    private JComboBox<String> rooms;
     private JButton searchRooms, bookRoom, viewBookings,logOut;
     private JTable roomsTable;
     private DefaultTableModel tableModel;
@@ -84,8 +85,11 @@ public class CustomerDashboard extends JFrame {
         JLabel lblChildren = createLabel("Children:", 450, 100, panel);
         children = createTextField("0", 600, 100, panel);
 
-        JLabel lblRooms = createLabel("Rooms:", 30, 170, panel);
-        rooms = createTextField("1", 180, 170, panel);
+        JLabel lblRooms = createLabel("Room Type:", 30, 170, panel);
+        rooms = new JComboBox<>(new String[]{"All", "Single", "Double", "Suite"});
+        rooms.setBounds(180, 170, 100, 30);
+        rooms.setFont(new Font("Times New Roman", Font.BOLD, 20));
+        panel.add(rooms);
 
         searchRooms = createButton("Search Rooms", 400, 240, panel);
         bookRoom = createButton("Book Room", 650, 240, panel);
@@ -224,13 +228,27 @@ public class CustomerDashboard extends JFrame {
     }
 
     private void searchRooms() {
+        String selectedRoomType = rooms.getSelectedItem().toString(); // Get selected room type
+
         try (Connection conn = Database.connect()) {
             String sql = "SELECT room_id, room_type, price, availability_status FROM rooms WHERE availability_status = 'available'";
+
+            // If a specific room type is selected, filter by it
+            if (!selectedRoomType.equals("All")) {
+                sql += " AND room_type = ?";
+            }
+
             PreparedStatement stmt = conn.prepareStatement(sql);
+
+            // Set the room type parameter if filtering
+            if (!selectedRoomType.equals("All")) {
+                stmt.setString(1, selectedRoomType);
+            }
+
             ResultSet rs = stmt.executeQuery();
-            
+
             tableModel.setRowCount(0); // Clear table before adding new data
-            
+
             while (rs.next()) {
                 String roomID = rs.getString("room_id");
                 String roomType = rs.getString("room_type");
@@ -242,6 +260,7 @@ public class CustomerDashboard extends JFrame {
             JOptionPane.showMessageDialog(this, "Error fetching rooms: " + e.getMessage());
         }
     }
+
 
     private void bookSelectedRoom() {
         int selectedRow = roomsTable.getSelectedRow();

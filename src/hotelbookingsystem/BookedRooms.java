@@ -54,20 +54,20 @@ public class BookedRooms extends JFrame {
         add(customerPanel);
 
         
-        JLabel lblCustomerId = createLabel("Customer ID:", 10, 10, customerPanel);
-        JTextField txtCustomerId = createTextField("", 130, 10, customerPanel);
+        lblCustomerId = createLabel("Customer ID:", 10, 10, customerPanel);
+         txtCustomerId = createTextField("", 130, 10, customerPanel);
         
-        JLabel lblCustomerName = createLabel("Customer Name:", 10, 40, customerPanel);
-        JTextField txtCustomerName = createTextField("", 130, 40, customerPanel);
+         lblCustomerName = createLabel("Customer Name:", 10, 40, customerPanel);
+         txtCustomerName = createTextField("", 130, 40, customerPanel);
         
-        JLabel lblEmail = createLabel("Email:", 10, 70, customerPanel);
-        JTextField txtEmail = createTextField("", 130, 70, customerPanel);
+         lblEmail = createLabel("Email:", 10, 70, customerPanel);
+         txtEmail = createTextField("", 130, 70, customerPanel);
         
-        JLabel lblPhone = createLabel("Phone:", 10, 100, customerPanel);
-        JTextField txtPhone = createTextField("", 130, 100, customerPanel);
+         lblPhone = createLabel("Phone:", 10, 100, customerPanel);
+         txtPhone = createTextField("", 130, 100, customerPanel);
         
-        JLabel lblUserId = createLabel("User ID:", 10, 130, customerPanel);
-        JTextField txtUserId = createTextField("", 130, 130, customerPanel);
+         lblUserId = createLabel("User ID:", 10, 130, customerPanel);
+         txtUserId = createTextField("", 130, 130, customerPanel);
 
         txtCustomerId.setEditable(false);
         txtCustomerName.setEditable(false);
