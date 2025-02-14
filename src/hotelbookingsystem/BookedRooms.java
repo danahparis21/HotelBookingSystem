@@ -1,5 +1,8 @@
 package hotelbookingsystem;
 
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.MouseAdapter;
@@ -8,6 +11,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.swing.border.LineBorder;
+import javax.swing.table.JTableHeader;
 
 public class BookedRooms extends JFrame {
     private JTable bookedRooms;
@@ -17,53 +22,52 @@ public class BookedRooms extends JFrame {
 
     public BookedRooms() {
         setTitle("Booked Rooms");
-        setSize(900, 500);
+        setSize(1000, 500);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(null);
+        getContentPane().setBackground(Color.WHITE); // Set background color
 
         JLabel titleLabel = new JLabel("Booked Rooms", SwingConstants.CENTER);
-        titleLabel.setBounds(250, 10, 400, 30);
+        titleLabel.setFont(new Font("Times New Roman", Font.BOLD, 20));
+        titleLabel.setBounds(350, 10, 200, 30);
         add(titleLabel);
 
         // Table setup
         String[] columns = {"Booking ID", "Customer ID", "Room ID", "Room Type", "Price", "Check-In", "Check-Out", "Status", "Room Status"};
         tableModel = new DefaultTableModel(columns, 0);
         bookedRooms = new JTable(tableModel);
+        styleTable(bookedRooms);
 
         // Scroll pane
         JScrollPane scrollPane = new JScrollPane(bookedRooms);
-        scrollPane.setBounds(30, 50, 540, 300);
+        scrollPane.setBounds(30, 50, 650, 300);
         add(scrollPane);
 
         // Customer Information Panel
         JPanel customerPanel = new JPanel();
         customerPanel.setLayout(null);
-        customerPanel.setBounds(600, 50, 270, 200);
+        customerPanel.setBounds(700, 50, 270, 200);
+        customerPanel.setBackground(Color.WHITE);
+      
+        customerPanel.setBorder(new LineBorder(Color.GRAY, 1));
         add(customerPanel);
 
-        lblCustomerId = new JLabel("Customer ID:");
-        lblCustomerName = new JLabel("Customer Name:");
-        lblEmail = new JLabel("Email:");
-        lblPhone = new JLabel("Phone:");
-        lblUserId = new JLabel("User ID:");
-
-        txtCustomerId = new JTextField();
-        txtCustomerName = new JTextField();
-        txtEmail = new JTextField();
-        txtPhone = new JTextField();
-        txtUserId = new JTextField();
-
-        lblCustomerId.setBounds(10, 10, 100, 20);
-        txtCustomerId.setBounds(120, 10, 130, 20);
-        lblCustomerName.setBounds(10, 40, 100, 20);
-        txtCustomerName.setBounds(120, 40, 130, 20);
-        lblEmail.setBounds(10, 70, 100, 20);
-        txtEmail.setBounds(120, 70, 130, 20);
-        lblPhone.setBounds(10, 100, 100, 20);
-        txtPhone.setBounds(120, 100, 130, 20);
-        lblUserId.setBounds(10, 130, 100, 20);
-        txtUserId.setBounds(120, 130, 130, 20);
+        
+        JLabel lblCustomerId = createLabel("Customer ID:", 10, 10, customerPanel);
+        JTextField txtCustomerId = createTextField("", 130, 10, customerPanel);
+        
+        JLabel lblCustomerName = createLabel("Customer Name:", 10, 40, customerPanel);
+        JTextField txtCustomerName = createTextField("", 130, 40, customerPanel);
+        
+        JLabel lblEmail = createLabel("Email:", 10, 70, customerPanel);
+        JTextField txtEmail = createTextField("", 130, 70, customerPanel);
+        
+        JLabel lblPhone = createLabel("Phone:", 10, 100, customerPanel);
+        JTextField txtPhone = createTextField("", 130, 100, customerPanel);
+        
+        JLabel lblUserId = createLabel("User ID:", 10, 130, customerPanel);
+        JTextField txtUserId = createTextField("", 130, 130, customerPanel);
 
         txtCustomerId.setEditable(false);
         txtCustomerName.setEditable(false);
@@ -71,39 +75,29 @@ public class BookedRooms extends JFrame {
         txtPhone.setEditable(false);
         txtUserId.setEditable(false);
 
-        customerPanel.add(lblCustomerId);
-        customerPanel.add(txtCustomerId);
-        customerPanel.add(lblCustomerName);
-        customerPanel.add(txtCustomerName);
-        customerPanel.add(lblEmail);
-        customerPanel.add(txtEmail);
-        customerPanel.add(lblPhone);
-        customerPanel.add(txtPhone);
-        customerPanel.add(lblUserId);
-        customerPanel.add(txtUserId);
+        
 
         // Close Button
-        JButton closeButton = new JButton("Close");
-        closeButton.setBounds(350, 370, 100, 30);
-        add(closeButton);
+        JButton closeButton = createButton("Close", 450, 400);
+       
+        
         closeButton.addActionListener(e -> dispose());
 
         // Fetch bookings from the database
         fetchBookings();
         
         // Check-In Button
-        JButton checkInButton = new JButton("Check In");
-        checkInButton.setBounds(600, 270, 120, 30);
-        add(checkInButton);
+        JButton checkInButton = createButton("Check In", 700, 270);
+        
         checkInButton.setEnabled(false); // Disabled until a row is selected
         
         
 
         // Check-Out Button
-        JButton checkOutButton = new JButton("Check Out");
-        checkOutButton.setBounds(750, 270, 120, 30);
-        add(checkOutButton);
-        checkOutButton.setEnabled(false); // Disabled until a room is checked in
+       
+        JButton checkOutButton = createButton("Check Out", 820, 270);
+       
+        checkOutButton.setEnabled(false); 
 
 
         // Table row selection listener
@@ -175,6 +169,83 @@ public class BookedRooms extends JFrame {
         });
 
 
+    }
+    private JLabel createLabel(String text, int x, int y, JPanel panel) {
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("Times New Roman", Font.BOLD, 16));
+        label.setBounds(x, y, 150, 30);
+        panel.add(label);
+        return label;
+    }
+
+    private JTextField createTextField(String text, int x, int y, JPanel panel) {
+        JTextField textField = new JTextField(text);
+        textField.setFont(new Font("Times New Roman", Font.PLAIN, 16));
+        textField.setBounds(x, y, 100, 30);
+        panel.add(textField);
+        return textField;
+    }
+
+    private JButton createButton(String text, int x, int y) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("SansSerif", Font.BOLD, 14));
+        button.setBounds(x, y, 100, 40);
+
+        // Default colors
+        Color defaultBg = new Color(0x393939);
+        Color defaultFg = Color.WHITE;
+        Color hoverBg = Color.WHITE;
+        Color hoverFg = new Color(0x393939);
+
+        // Apply default styling
+        button.setBackground(defaultBg);
+        button.setForeground(defaultFg);
+        button.setBorder(BorderFactory.createLineBorder(defaultBg, 2));
+        button.setFocusPainted(false);
+        button.setOpaque(true);
+
+        // Add hover effect
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(hoverBg);
+                button.setForeground(hoverFg);
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(defaultBg);
+                button.setForeground(defaultFg);
+            }
+        });
+
+       add(button);
+        return button;
+    }
+    
+    private void styleTable(JTable table) {
+        // Table Header Styling
+        JTableHeader header = table.getTableHeader();
+        header.setFont(new Font("SansSerif", Font.BOLD, 16));
+        header.setBackground(new Color(0x393939)); // Dark Gray
+        header.setForeground(Color.WHITE);
+        header.setOpaque(true);
+
+        // Table Body Styling
+        table.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        table.setRowHeight(30);
+        table.setBackground(Color.WHITE);
+        table.setForeground(new Color(0x393939));
+        table.setGridColor(new Color(0xD3D3D3)); // Light Gray Grid
+        table.setShowGrid(false); // Hide default grid lines
+        table.setIntercellSpacing(new Dimension(0, 0)); // Remove default spacing
+
+        // Selection Styling
+        table.setSelectionBackground(new Color(0x393939));
+        table.setSelectionForeground(Color.WHITE);
+
+        // Borderless Look
+        table.setBorder(BorderFactory.createEmptyBorder());
     }
     
     private void generateReceipt(int selectedRow) {

@@ -5,12 +5,15 @@ import javax.swing.table.DefaultTableModel;
 import com.toedter.calendar.JDateChooser;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.event.*;
 import java.sql.*;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.table.JTableHeader;
 
 public class CustomerDashboard extends JFrame {
     private JDateChooser checkInDate;
@@ -32,7 +35,7 @@ public class CustomerDashboard extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(null);
-        getContentPane().setBackground(new Color(248, 247, 246)); // Set background color
+        getContentPane().setBackground(Color.WHITE); // Set background color
 
         // Header Image
         ImageIcon icon = new ImageIcon(getClass().getResource("/icons/header1.png"));
@@ -47,45 +50,73 @@ public class CustomerDashboard extends JFrame {
 
         }
     });
+        JPanel panel = new JPanel();
+        panel.setBounds(20, 100, 1200, 300);
+        panel.setBackground(Color.WHITE);
+        panel.setLayout(null);
+        panel.setBorder(new LineBorder(Color.GRAY, 1));
+        add(panel);
 
-        JLabel lblCheckIn = createLabel("Check-in Date:", 30, 100);
+        // Modernized Labels & Inputs
+        JLabel lblCheckIn = createLabel("Check-in Date:", 30, 30, panel);
         checkInDate = new JDateChooser();
-        checkInDate.setBounds(140, 100, 150, 30);
-        add(checkInDate);
+        checkInDate.setBounds(180, 30, 200, 35);
+        checkInDate.setFont(new Font("Times New Roman", Font.BOLD, 20));
+        panel.add(checkInDate);
 
-        JLabel lblDuration = createLabel("Duration (days):", 30, 150);
+        JLabel lblDuration = createLabel("Duration (days):", 450, 30, panel);
         duration = new JSpinner(new SpinnerNumberModel(1, 1, 30, 1));
-        duration.setBounds(140, 150, 50, 30);
-        add(duration);
+        duration.setFont(new Font("Times New Roman", Font.BOLD, 20));
+        duration.setBounds(600, 30, 100, 35);
+        
+        panel.add(duration);
 
-        JLabel lblCheckOut = createLabel("Check-out Date:", 30, 200);
+        JLabel lblCheckOut = createLabel("Check-out Date:", 750, 30, panel);
         checkOutDate = new JTextField();
-        checkOutDate.setBounds(140, 200, 150, 30);
+        checkOutDate.setBounds(900, 30, 200, 35);
         checkOutDate.setEditable(false);
-        add(checkOutDate);
+        checkOutDate.setFont(new Font("Times New Roman", Font.BOLD, 20));
+        panel.add(checkOutDate);
 
-        JLabel lblAdults = createLabel("Adults:", 30, 250);
-        adults = createTextField("1", 80, 250);
+        JLabel lblAdults = createLabel("Adults:", 30, 100, panel);
+        adults = createTextField("1", 180, 100, panel);
 
-        JLabel lblChildren = createLabel("Children:", 150, 250);
-        children = createTextField("0", 220, 250);
+        JLabel lblChildren = createLabel("Children:", 450, 100, panel);
+        children = createTextField("0", 600, 100, panel);
 
-        JLabel lblRooms = createLabel("Rooms:", 30, 300);
-        rooms = createTextField("1", 80, 300);
+        JLabel lblRooms = createLabel("Rooms:", 30, 170, panel);
+        rooms = createTextField("1", 180, 170, panel);
 
-        searchRooms = createButton("Search Rooms", 30, 350);
-        bookRoom = createButton("Book Room", 200, 350);
+        searchRooms = createButton("Search Rooms", 400, 240, panel);
+        bookRoom = createButton("Book Room", 650, 240, panel);
         
 
         String[] columns = {"Room ID", "Type", "Price", "Availability"};
         tableModel = new DefaultTableModel(columns, 0);
         roomsTable = new JTable(tableModel);
+        styleTable(roomsTable);
+        
+        
+
         JScrollPane scrollPane = new JScrollPane(roomsTable);
-        scrollPane.setBounds(30, 420, 700, 300);
+        scrollPane.setBounds(20, 420, 1200, 360);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder()); // Remove ScrollPane border
         add(scrollPane);
         
-        viewBookings = createButton("View My Bookings", 1000, 350);
-        logOut = createButton("Log Out", 1000, 400);
+        JPanel panel2 = new JPanel();
+        panel2.setBounds(1250, 100, 250, 690);
+        panel2.setBackground(Color.WHITE);
+        panel2.setLayout(null);
+        panel2.setBorder(new LineBorder(Color.GRAY, 1));
+        add(panel2);
+        
+        
+        viewBookings = createButton("View My Bookings", 25, 50, panel2);
+       
+        logOut = createButton("Log Out", 25, 120, panel2);
+        
+       
+
         
         // Calculate check-out date based on duration
         duration.addChangeListener(e -> updateCheckOutDate());
@@ -98,35 +129,84 @@ public class CustomerDashboard extends JFrame {
         logOut.addActionListener(e -> logOut());
     }
     
-    private JLabel createLabel(String text, int x, int y) {
+    private void styleTable(JTable table) {
+        // Table Header Styling
+        JTableHeader header = table.getTableHeader();
+        header.setFont(new Font("SansSerif", Font.BOLD, 16));
+        header.setBackground(new Color(0x393939)); // Dark Gray
+        header.setForeground(Color.WHITE);
+        header.setOpaque(true);
+
+        // Table Body Styling
+        table.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        table.setRowHeight(30);
+        table.setBackground(Color.WHITE);
+        table.setForeground(new Color(0x393939));
+        table.setGridColor(new Color(0xD3D3D3)); // Light Gray Grid
+        table.setShowGrid(false); // Hide default grid lines
+        table.setIntercellSpacing(new Dimension(0, 0)); // Remove default spacing
+
+        // Selection Styling
+        table.setSelectionBackground(new Color(0x393939));
+        table.setSelectionForeground(Color.WHITE);
+
+        // Borderless Look
+        table.setBorder(BorderFactory.createEmptyBorder());
+    }
+    
+    private JLabel createLabel(String text, int x, int y, JPanel panel) {
         JLabel label = new JLabel(text);
-        label.setBounds(x, y, 120, 30);
-        label.setFont(new Font("SansSerif", Font.BOLD, 14));
-        label.setForeground(new Color(50, 50, 50));
+        label.setFont(new Font("Times New Roman", Font.BOLD, 20));
+        label.setBounds(x, y, 150, 30);
         panel.add(label);
         return label;
     }
 
-    private JTextField createTextField(String text, int x, int y) {
+    private JTextField createTextField(String text, int x, int y, JPanel panel) {
         JTextField textField = new JTextField(text);
-        textField.setBounds(x, y, 50, 30);
-        textField.setFont(new Font("SansSerif", Font.PLAIN, 14));
-        add(textField);
+        textField.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        textField.setBounds(x, y, 100, 35);
+        panel.add(textField);
         return textField;
     }
 
-    private JButton createButton(String text, int x, int y) {
+    private JButton createButton(String text, int x, int y, JPanel panel) {
         JButton button = new JButton(text);
-        button.setBounds(x, y, 170, 40);
-        button.setBackground(new Color(30, 144, 255));
-        button.setForeground(Color.WHITE);
         button.setFont(new Font("SansSerif", Font.BOLD, 14));
+        button.setBounds(x, y, 200, 50);
+
+        // Default colors
+        Color defaultBg = new Color(0x393939);
+        Color defaultFg = Color.WHITE;
+        Color hoverBg = Color.WHITE;
+        Color hoverFg = new Color(0x393939);
+
+        // Apply default styling
+        button.setBackground(defaultBg);
+        button.setForeground(defaultFg);
+        button.setBorder(BorderFactory.createLineBorder(defaultBg, 2));
         button.setFocusPainted(false);
-        button.setBorder(new EmptyBorder(5, 10, 5, 10));
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        add(button);
+        button.setOpaque(true);
+
+        // Add hover effect
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(hoverBg);
+                button.setForeground(hoverFg);
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(defaultBg);
+                button.setForeground(defaultFg);
+            }
+        });
+
+        panel.add(button);
         return button;
     }
+
     
     private void logOut(){
         new LogInForm();

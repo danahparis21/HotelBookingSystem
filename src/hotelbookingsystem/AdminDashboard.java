@@ -1,14 +1,22 @@
 package hotelbookingsystem;
 
+import com.toedter.calendar.JDateChooser;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Font;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.swing.border.LineBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.table.JTableHeader;
 
 public class AdminDashboard extends JFrame {
     private JTable roomTable;
@@ -16,6 +24,7 @@ public class AdminDashboard extends JFrame {
     private JTextField searchRoomIdField, searchPriceField;
     private JComboBox<String> searchTypeCombo, searchStatusCombo;
     private JLabel bookedRoomsLabel, availableRoomsLabel, guestCountLabel;
+    
 
     public AdminDashboard() {
         setTitle("Admin Dashboard");
@@ -23,19 +32,35 @@ public class AdminDashboard extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(null);
+        getContentPane().setBackground(Color.decode("#2c2d2f")); // Set background color
 
-        JLabel titleLabel = new JLabel("Admin Dashboard", SwingConstants.CENTER);
-        titleLabel.setBounds(250, 10, 400, 30);
-        add(titleLabel);
+        // Header Image
+        ImageIcon icon = new ImageIcon(getClass().getResource("/icons/header1.png"));
+        JLabel header = new JLabel(icon);
+        header.setBounds(0, 0, 1920, 70);
+        add(header);
+        
+        addComponentListener(new ComponentAdapter() {
+        @Override
+        public void componentResized(ComponentEvent e) {
+            header.setBounds((getWidth() - icon.getIconWidth()) / 2, 0, icon.getIconWidth(), icon.getIconHeight());
 
+        }
+    });
+
+        JPanel panel = new JPanel();
+        panel.setBounds(20, 100, 1200, 90);
+        panel.setBackground(Color.WHITE);
+        panel.setLayout(null);
+        panel.setBorder(new LineBorder(Color.GRAY, 1));
+        add(panel);
+        
+        // Modernized Labels & Inputs
+       
         // Search Panel
-        JLabel searchLabel = new JLabel("Search:");
-        searchLabel.setBounds(50, 50, 100, 25);
-        add(searchLabel);
-
-        searchRoomIdField = new JTextField("Room ID");
-        searchRoomIdField.setBounds(100, 50, 80, 25);
-        searchRoomIdField.setForeground(Color.GRAY);
+        
+        JLabel searchLabel = createLabel("Search", 20, 30, panel);
+        searchRoomIdField = createTextField("Room ID", 90, 30, panel);
         
 
         searchRoomIdField.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -56,20 +81,18 @@ public class AdminDashboard extends JFrame {
             }
         });
 
-        add(searchRoomIdField);
+        
 
         
-        JLabel typeLabel = new JLabel("Type:");
-        typeLabel.setBounds(190, 50, 50, 25);
-        add(typeLabel);
+        
 
+        createLabel("Type:", 220, 30, panel);
         searchTypeCombo = new JComboBox<>(new String[]{"All", "Single", "Double", "Suite"});
-        searchTypeCombo.setBounds(230, 50, 100, 25);
-        add(searchTypeCombo);
+        searchTypeCombo.setBounds(290, 30, 100, 30);
+        searchTypeCombo.setFont(new Font("Times New Roman", Font.BOLD, 18));
+        panel.add(searchTypeCombo);
 
-        searchPriceField = new JTextField();
-        searchPriceField.setBounds(340, 50, 80, 25);
-        searchPriceField.setToolTipText("Price");
+        searchPriceField = createTextField("Price", 450, 30, panel);
         searchPriceField.addFocusListener(new java.awt.event.FocusAdapter() {
             @Override
             public void focusGained(java.awt.event.FocusEvent evt) {
@@ -87,86 +110,93 @@ public class AdminDashboard extends JFrame {
                 }
             }
         });
-        add(searchPriceField);
+     
 
-        JLabel statusLabel = new JLabel("Status:");
-        statusLabel.setBounds(430, 50, 50, 25);
-        add(statusLabel);
-
+        createLabel("Status:", 600, 30, panel);
         searchStatusCombo = new JComboBox<>(new String[]{"All", "Available", "Booked", "Under Maintenance"});
-        searchStatusCombo.setBounds(480, 50, 140, 25);
-        add(searchStatusCombo);
+        searchStatusCombo.setBounds(680, 30, 140, 30);
+        searchStatusCombo.setFont(new Font("Times New Roman", Font.BOLD, 18));
+        panel.add(searchStatusCombo);
 
-
-        JButton searchButton = new JButton("Search");
-        searchButton.setBounds(640, 50, 100, 25);
-        add(searchButton);
+        JButton searchButton = createButton("Search", 950, 20, panel);
+        
         
         // Statistics Panel
         JPanel statsPanel = new JPanel();
-        statsPanel.setBounds(50, 600, 800, 80);
+        statsPanel.setBounds(20, 660, 1200, 90);
         statsPanel.setLayout(null);
-        statsPanel.setBorder(BorderFactory.createTitledBorder("Today's Summary"));
+        statsPanel.setBackground(Color.WHITE);
+        statsPanel.setBorder(BorderFactory.createTitledBorder(
+                BorderFactory.createLineBorder(Color.GRAY, 1),
+                "Today's Summary",
+                TitledBorder.LEADING,
+                TitledBorder.TOP,
+                new Font("Times New Roman", Font.BOLD, 14), 
+                Color.DARK_GRAY
+        ));
         add(statsPanel);
 
+        // Labels with Elegant Font
+        Font labelFont = new Font("Times New Roman", Font.BOLD, 20);
+
         bookedRoomsLabel = new JLabel("Booked Rooms: Loading...");
-        bookedRoomsLabel.setBounds(20, 20, 200, 25);
+        bookedRoomsLabel.setFont(labelFont);
+        bookedRoomsLabel.setBounds(30, 30, 250, 25);
         statsPanel.add(bookedRoomsLabel);
 
         availableRoomsLabel = new JLabel("Available Rooms: Loading...");
-        availableRoomsLabel.setBounds(250, 20, 200, 25);
+        availableRoomsLabel.setFont(labelFont);
+        availableRoomsLabel.setBounds(300, 30, 250, 25);
         statsPanel.add(availableRoomsLabel);
 
         guestCountLabel = new JLabel("Guests: Loading...");
-        guestCountLabel.setBounds(500, 20, 200, 25);
+        guestCountLabel.setFont(labelFont);
+        guestCountLabel.setBounds(600, 30, 200, 25);
         statsPanel.add(guestCountLabel);
 
-        JButton refreshStatsButton = new JButton("Refresh Stats");
-        refreshStatsButton.setBounds(650, 20, 120, 30);
-        statsPanel.add(refreshStatsButton);
+        JButton refreshStatsButton = createButton("Refresh Stats", 950, 20, statsPanel);
+        
         refreshStatsButton.addActionListener(e -> loadStatistics());
 
         // Table setup
         tableModel = new DefaultTableModel(new String[]{"Room ID", "Type", "Price", "Status"}, 0);
         roomTable = new JTable(tableModel);
+        styleTable(roomTable);
         JScrollPane scrollPane = new JScrollPane(roomTable);
-        scrollPane.setBounds(50, 100, 800, 300);
+        scrollPane.setBounds(20, 200, 1200, 350);
         add(scrollPane);
 
+        
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setBounds(20, 560, 1200, 90);
+        buttonPanel.setBackground(Color.WHITE);
+        buttonPanel.setLayout(null);
+        buttonPanel.setBorder(new LineBorder(Color.GRAY, 1));
+        add(buttonPanel);
+        
         // Buttons
-        JButton addButton = new JButton("Add Room");
-        JButton updateButton = new JButton("Update Room");
-        JButton deleteButton = new JButton("Delete Room");
-        JButton refreshButton = new JButton("Refresh");
+        JButton addButton = createButton("Add Room", 50, 20, buttonPanel);
+        JButton updateButton = createButton("Update Room", 350, 20, buttonPanel);
+        JButton deleteButton = createButton("Delete Room", 650, 20, buttonPanel);
+        JButton refreshButton = createButton("Refresh", 950, 20, buttonPanel);
+        
+        
 
-        addButton.setBounds(50, 450, 150, 30);
-        updateButton.setBounds(220, 450, 150, 30);
-        deleteButton.setBounds(390, 450, 150, 30);
-        refreshButton.setBounds(560, 450, 150, 30);
-
-        add(addButton);
-        add(updateButton);
-        add(deleteButton);
-        add(refreshButton);
         
         //OTHER BUTTONS
-        JButton bookedRooms = new JButton("Booked Rooms & Customer");
-        JButton checkIn = new JButton("Check - In");
-        JButton checkOut = new JButton("Check - Out");
-        JButton bookingHistory = new JButton("Booking History");
-        JButton performance = new JButton("Performance");
-        JButton logOut = new JButton("Log Out");
+        JPanel panel2 = new JPanel();
+        panel2.setBounds(1250, 100, 250, 690);
+        panel2.setBackground(Color.WHITE);
+        panel2.setLayout(null);
+        panel2.setBorder(new LineBorder(Color.GRAY, 1));
+        add(panel2);
         
-        bookedRooms.setBounds(1000, 100, 200, 30);
-        bookingHistory.setBounds(1000, 400, 200, 30);
-        performance.setBounds(1000, 500, 200, 30);
-        logOut.setBounds(1000, 600, 200, 30);
         
-        add(bookedRooms);
-        add(bookingHistory);
-        add(performance);
-        add(logOut);
-        
+        JButton bookedRooms = createButton("Booked Rooms", 25, 50, panel2);
+       
+        JButton bookingHistory = createButton("Booking History", 25, 120, panel2);
+        JButton performance = createButton("Performance", 25, 190, panel2);
+        JButton logOut = createButton("Log Out", 25, 260, panel2);
         
 
         // Button Listeners
@@ -185,6 +215,85 @@ public class AdminDashboard extends JFrame {
         loadRooms();
         loadStatistics();
     }
+    
+    private void styleTable(JTable table) {
+        // Table Header Styling
+        JTableHeader header = table.getTableHeader();
+        header.setFont(new Font("SansSerif", Font.BOLD, 16));
+        header.setBackground(new Color(0x393939)); // Dark Gray
+        header.setForeground(Color.WHITE);
+        header.setOpaque(true);
+
+        // Table Body Styling
+        table.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        table.setRowHeight(30);
+        table.setBackground(Color.WHITE);
+        table.setForeground(new Color(0x393939));
+        table.setGridColor(new Color(0xD3D3D3)); // Light Gray Grid
+        table.setShowGrid(false); // Hide default grid lines
+        table.setIntercellSpacing(new Dimension(0, 0)); // Remove default spacing
+
+        // Selection Styling
+        table.setSelectionBackground(new Color(0x393939));
+        table.setSelectionForeground(Color.WHITE);
+
+        // Borderless Look
+        table.setBorder(BorderFactory.createEmptyBorder());
+    }
+    
+    private JLabel createLabel(String text, int x, int y, JPanel panel) {
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("Times New Roman", Font.BOLD, 20));
+        label.setBounds(x, y, 150, 30);
+        panel.add(label);
+        return label;
+    }
+
+    private JTextField createTextField(String text, int x, int y, JPanel panel) {
+        JTextField textField = new JTextField(text);
+        textField.setFont(new Font("Times New Roman", Font.PLAIN, 20));
+        textField.setBounds(x, y, 100, 35);
+        panel.add(textField);
+        return textField;
+    }
+
+    private JButton createButton(String text, int x, int y, JPanel panel) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("SansSerif", Font.BOLD, 14));
+        button.setBounds(x, y, 200, 50);
+
+        // Default colors
+        Color defaultBg = new Color(0x393939);
+        Color defaultFg = Color.WHITE;
+        Color hoverBg = Color.WHITE;
+        Color hoverFg = new Color(0x393939);
+
+        // Apply default styling
+        button.setBackground(defaultBg);
+        button.setForeground(defaultFg);
+        button.setBorder(BorderFactory.createLineBorder(defaultBg, 2));
+        button.setFocusPainted(false);
+        button.setOpaque(true);
+
+        // Add hover effect
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(hoverBg);
+                button.setForeground(hoverFg);
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(defaultBg);
+                button.setForeground(defaultFg);
+            }
+        });
+
+        panel.add(button);
+        return button;
+    }
+    
     private void logOut(){
         new LogInForm();
         dispose();

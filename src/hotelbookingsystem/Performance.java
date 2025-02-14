@@ -31,33 +31,31 @@ public class Performance extends JFrame {
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLayout(null);
         setLocationRelativeTo(null);
+        getContentPane().setBackground(Color.WHITE); // Set background color
+
 
         int chartWidth = 400;
         int chartHeight = 300;
 
         barChartPanel = new ChartPanel(createBarChart("Daily"));
-        barChartPanel.setBounds(20, 20, chartWidth, chartHeight);
+        barChartPanel.setBounds(20, 20, 800, 550);
 
         ChartPanel pieChartPanel = new ChartPanel(createPieChart());
-        pieChartPanel.setBounds(440, 20, chartWidth, chartHeight);
+        pieChartPanel.setBounds(860, 350, chartWidth, chartHeight);
 
         ChartPanel lineChartPanel = new ChartPanel(createLineChart());
         lineChartPanel.setBounds(860, 20, chartWidth, chartHeight);
 
-        JButton dailyButton = new JButton("Daily");
-        dailyButton.setBounds(50, 330, 100, 30);
+        JButton dailyButton = createButton("Daily", 50, 600);
         dailyButton.addActionListener(e -> updateBarChart("Daily"));
 
-        JButton weeklyButton = new JButton("Weekly");
-        weeklyButton.setBounds(160, 330, 100, 30);
-        weeklyButton.addActionListener(e -> updateBarChart("Weekly"));
+        JButton weeklyButton = createButton("Daily", 160, 600);
+        dailyButton.addActionListener(e -> updateBarChart("Weekly"));
+        
+        JButton monthlyButton = createButton("Monthly", 270, 600);
+        dailyButton.addActionListener(e -> updateBarChart("Monthly"));
 
-        JButton monthlyButton = new JButton("Monthly");
-        monthlyButton.setBounds(270, 330, 100, 30);
-        monthlyButton.addActionListener(e -> updateBarChart("Monthly"));
-
-        JButton closeButton = new JButton("Close");
-        closeButton.setBounds(550, 640, 150, 40);
+        JButton closeButton = createButton("Close", 550, 620);
         closeButton.addActionListener(e -> dispose());
 
         add(barChartPanel);
@@ -69,6 +67,42 @@ public class Performance extends JFrame {
         add(closeButton);
 
         setVisible(true);
+    }
+    private JButton createButton(String text, int x, int y) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("SansSerif", Font.BOLD, 14));
+        button.setBounds(x, y, 100, 30);
+
+        // Default colors
+        Color defaultBg = new Color(0x393939);
+        Color defaultFg = Color.WHITE;
+        Color hoverBg = Color.WHITE;
+        Color hoverFg = new Color(0x393939);
+
+        // Apply default styling
+        button.setBackground(defaultBg);
+        button.setForeground(defaultFg);
+        button.setBorder(BorderFactory.createLineBorder(defaultBg, 2));
+        button.setFocusPainted(false);
+        button.setOpaque(true);
+
+        // Add hover effect
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(hoverBg);
+                button.setForeground(hoverFg);
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(defaultBg);
+                button.setForeground(defaultFg);
+            }
+        });
+
+        add(button);
+        return button;
     }
 
     private JFreeChart createBarChart(String filter) {

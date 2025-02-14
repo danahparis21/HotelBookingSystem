@@ -6,25 +6,29 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.*;
+import javax.swing.table.JTableHeader;
 
 public class ViewBookings extends JFrame {
     private JTable bookingsTable;
     private DefaultTableModel tableModel;
-    private JButton cancelButton;
+    private JButton cancelButton, closeButton;
     private int customerID;
     private int selectedBookingID = -1; // Store selected booking ID
 
     public ViewBookings(int customerID) {
         this.customerID = customerID;
         setTitle("My Bookings");
-        setSize(600, 450);
+        setSize(800, 450);
         setLocationRelativeTo(null);
         setLayout(null);
+        //getContentPane().setBackground(new Color(248, 247, 246)); // Set background color
+        getContentPane().setBackground(Color.WHITE);
+
 
         // Title Label
         JLabel titleLabel = new JLabel("My Bookings");
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
-        titleLabel.setBounds(230, 10, 200, 30);
+        titleLabel.setFont(new Font("Times New Roman", Font.BOLD, 20));
+        titleLabel.setBounds(350, 10, 200, 30);
         add(titleLabel);
 
         // Table setup
@@ -32,21 +36,22 @@ public class ViewBookings extends JFrame {
         tableModel = new DefaultTableModel(columns, 0);
         bookingsTable = new JTable(tableModel);
         bookingsTable.removeColumn(bookingsTable.getColumnModel().getColumn(0)); // Hide Booking ID
+        styleTable(bookingsTable);
+        
+        
 
         // Scroll pane
         JScrollPane scrollPane = new JScrollPane(bookingsTable);
-        scrollPane.setBounds(30, 50, 540, 250);
+        scrollPane.setBounds(30, 50, 720, 250);
         add(scrollPane);
 
         // Cancel Booking Button
-        cancelButton = new JButton("Cancel Booking");
-        cancelButton.setBounds(150, 320, 150, 30);
-        cancelButton.setEnabled(false); // Disabled by default
-        add(cancelButton);
+        cancelButton = createButton("Cancel Booking", 150, 320);
+        add(cancelButton); // Ensure it's added to the frame
+        cancelButton.setEnabled(false); // Disabled initially
 
-        // Close Button
-        JButton closeButton = new JButton("Close");
-        closeButton.setBounds(350, 320, 100, 30);
+        
+        closeButton = createButton("Close", 450, 320);
         add(closeButton);
 
         // Close Action
@@ -72,6 +77,67 @@ public class ViewBookings extends JFrame {
         cancelButton.addActionListener(e -> cancelBooking());
 
         setVisible(true);
+    }
+    private JButton createButton(String text, int x, int y) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("SansSerif", Font.BOLD, 14));
+        button.setBounds(x, y, 200, 50);
+
+        // Default colors
+        Color defaultBg = new Color(0x393939);
+        Color defaultFg = Color.WHITE;
+        Color hoverBg = Color.WHITE;
+        Color hoverFg = new Color(0x393939);
+
+        // Apply default styling
+        button.setBackground(defaultBg);
+        button.setForeground(defaultFg);
+        button.setBorder(BorderFactory.createLineBorder(defaultBg, 2));
+        button.setFocusPainted(false);
+        button.setOpaque(true);
+
+        // Add hover effect
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(hoverBg);
+                button.setForeground(hoverFg);
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(defaultBg);
+                button.setForeground(defaultFg);
+            }
+        });
+
+        add(button);
+        return button;
+    }
+    
+    private void styleTable(JTable table) {
+        // Table Header Styling
+        JTableHeader header = table.getTableHeader();
+        header.setFont(new Font("SansSerif", Font.BOLD, 16));
+        header.setBackground(new Color(0x393939)); // Dark Gray
+        header.setForeground(Color.WHITE);
+        header.setOpaque(true);
+
+        // Table Body Styling
+        table.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        table.setRowHeight(30);
+        table.setBackground(Color.WHITE);
+        table.setForeground(new Color(0x393939));
+        table.setGridColor(new Color(0xD3D3D3)); // Light Gray Grid
+        table.setShowGrid(false); // Hide default grid lines
+        table.setIntercellSpacing(new Dimension(0, 0)); // Remove default spacing
+
+        // Selection Styling
+        table.setSelectionBackground(new Color(0x393939));
+        table.setSelectionForeground(Color.WHITE);
+
+        // Borderless Look
+        table.setBorder(BorderFactory.createEmptyBorder());
     }
 
     private void fetchBookings() {
