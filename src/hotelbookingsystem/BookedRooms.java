@@ -270,7 +270,7 @@ public class BookedRooms extends JFrame {
                        "b.check_in_date, b.check_out_date, b.status, r.availability_status " +
                        "FROM bookings b " +
                        "JOIN customers c ON b.customer_id = c.customer_id " +
-                       "JOIN rooms r ON b.room_id = r.room_id WHERE r.availability_status = 'Booked'";
+                       "JOIN rooms r ON b.room_id = r.room_id WHERE r.availability_status = 'Booked' and b.status = 'Confirmed'";
       
 
         try (Connection conn = Database.connect();

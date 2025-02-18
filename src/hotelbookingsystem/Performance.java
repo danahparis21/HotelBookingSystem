@@ -49,7 +49,7 @@ public class Performance extends JFrame {
         JButton dailyButton = createButton("Daily", 50, 600);
         dailyButton.addActionListener(e -> updateBarChart("Daily"));
 
-        JButton weeklyButton = createButton("Daily", 160, 600);
+        JButton weeklyButton = createButton("Weekly", 160, 600);
         dailyButton.addActionListener(e -> updateBarChart("Weekly"));
         
         JButton monthlyButton = createButton("Monthly", 270, 600);
